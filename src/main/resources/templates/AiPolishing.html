@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Polishing</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 固定顶部栏的样式 */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 30;
+        }
+        /* 增加内容顶部间距 */
+        .main-content {
+            margin-top: 4rem; /* 根据需要调整 */
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+<header class="fixed-header">
+    <nav>
+        <nav aria-label="Top">
+            <!-- Secondary navigation -->
+            <div class="bg-white dark:bg-gray-800 transition-colors duration-300">
+                <div class="border-b border-gray-200 dark:border-black">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="flex h-16 items-center justify-between">
+                            <!-- Logo (lg+) -->
+                            <div class="hidden lg:flex lg:items-center">
+                                <a href="#">
+                                    <span class="sr-only">Recommendation system</span>
+                                    <img class="h-10 w-auto" src="./images/logo.png" alt="">
+                                </a>
+                            </div>
+
+                            <div class="hidden h-full lg:flex">
+                                <!-- Mega menus -->
+                                <div class="ml-8">
+                                    <div class="flex h-full justify-center space-x-8">
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="/home_page_auth" type="button" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">Home</a>
+                                            </div>
+
+                                        </div>
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="match_student" type="button" class="border-transparent text-grey-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">Match</a>
+                                            </div>
+                                        </div>
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="ai_polish" type="button" class="border-transparent text-purple-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">AI Polishing</a>
+                                            </div>
+                                        </div>
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="co_edit" type="button" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">Co-editing</a>
+                                            </div>
+                                        </div>
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="inbox" type="button" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">Inbox</a>
+                                            </div>
+                                        </div>
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="./subPage/Others/Help.html" type="button" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">Help</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile menu and search (lg-) -->
+                            <div class="flex flex-1 items-center lg:hidden">
+                                <!-- Mobile menu toggle, controls the 'mobileMenuOpen' state. -->
+                                <button id="mobile-menu-btn" type="button" class="-ml-2 rounded-md bg-white p-2 text-gray-400 dark:bg-gray-950">
+                                    <span class="sr-only">Open menu</span>
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                    </svg>
+                                </button>
+
+                                <!-- Search -->
+                                <a href="subPage/Search.html" class="ml-2 p-2 text-gray-400 hover:text-gray-500">
+                                    <span class="sr-only">Search</span>
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <!-- Logo (lg-) -->
+                            <a href="#" class="lg:hidden">
+                                <span class="sr-only">Easy Eat</span>
+                                <img src="images/logo.png" alt="" class="h-8 w-auto">
+                            </a>
+
+                            <div class="flex flex-1 items-center justify-end">
+                                <div class="flex items-center lg:ml-8">
+
+                                    <div class="hidden lg:flex">
+                                        <a href="subPage/Search.html" class="-m-2 p-2 text-gray-400 hover:text-gray-500">
+                                            <span class="sr-only">Search</span>
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+
+                                    <span class="mx-x h-6 w-px lg:mx-6" aria-hidden="true"></span>
+
+                                    <div class="flow-root">
+
+                                        <button id="translateLanguage" class="p-2 rounded-2xl bg-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 dark:bg-gray-700" onclick="window.location.href = 'index_chinese.html';">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                                            </svg>
+                                        </button>
+
+                                    </div>
+
+                                    <span class="mx-x h-6 w-px lg:mx-3" aria-hidden="true"></span>
+
+                                    <div class="flow-root">
+
+                                        <button id="toggleDarkMode" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 dark:bg-gray-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 text-gray-800 dark:text-gray-200">
+                                                <!-- Sun Icon -->
+                                                <g class="dark:hidden">
+                                                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.485-7.071l1.414 1.414M6.343 17.657l1.414-1.414m12.728 0l-1.414-1.414M6.343 6.343L4.93 7.757"/>
+                                                </g>
+                                                <!-- Moon Icon -->
+                                                <g class="hidden dark:block">
+                                                    <path fill="currentColor" d="M21 12.795A9.004 9.004 0 0012.205 3a7.5 7.5 0 018.8 8.8 9.005 9.005 0 00-.005 1.995z"/>
+                                                </g>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+
+
+                                    <span class="mx-4 h-6 w-px bg-gray-200 lg:mx-6" aria-hidden="true"></span>
+
+
+                                    <div id="signup-buttons" class="hidden flex space-x-8 px-4">
+                                        <a href="/log_in" type="button" class="rounded-md bg-white dark:bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-950 hover:bg-gray-50 dark:hover:bg-gray-700">Sign up</a>
+
+                                        <a href="/add_user" type="button" class="rounded-md bg-purple-500 dark:bg-purple-700 px-2.5 py-1.5 text-sm font-semibold text-white dark:text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</a>
+                                    </div>
+
+                                    <div id="user-links" class="flex space-x-8 px-4">
+
+
+
+                                        <div class="flex space-x-8">
+
+                                            <div class="flex">
+                                                <!-- Trigger Button -->
+                                                <button onclick="toggleDropdown()" class="-m-2 p-2 text-gray-400 hover:text-gray-500 focus:outline-none">
+                                                    <span class="sr-only">Account</span>
+                                                    <img class="inline-block h-10 w-10 rounded-full" src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?size=626&ext=jpg" alt="">
+                                                </button>
+
+                                                <!-- Dropdown Menu -->
+                                                <div id="dropdownMenu" class="hidden absolute right-[0px] z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none dark:bg-gray-950" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                                    <a href="#" class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-white" role="menuitem" tabindex="-1" id="user-menu-item-0">Your profile</a>
+                                                    <button onclick="logout()" class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-white" role="menuitem" tabindex="-1" id="user-menu-item-1">Sign out</button>
+                                                    <button onclick="closeDropdown()" class="content-center block w-full text-right px-3 py-1 text-gray-400 hover:text-gray-500">
+                                                        <span class="sr-only">Close</span>
+                                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </nav>
+</header>
+
+<div class="flex flex-1 main-content">
+    <!-- 左侧导航栏 -->
+    <div class="w-1/5 bg-gray-100 p-4 overflow-y-auto"> <!-- 将宽度从 w-1/4 改为 w-1/5 -->
+        <h2 class="text-xl font-semibold mb-4">Saved Letter</h2>
+        <div class="flex justify-between flex h-14 items-center">
+            <span class="flex" data-state="closed">
+                <button class="h-10 rounded-lg px-2 text-token-text-secondary focus-visible:outline-0 hover:bg-token-sidebar-surface-secondary focus-visible:bg-token-sidebar-surface-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" class="icon-xl-heavy">
+                        <path fill="currentColor" fill-rule="evenodd" d="M8.857 3h6.286c1.084 0 1.958 0 2.666.058.729.06 1.369.185 1.961.487a5 5 0 0 1 2.185 2.185c.302.592.428 1.233.487 1.961.058.708.058 1.582.058 2.666v3.286c0 1.084 0 1.958-.058 2.666-.06.729-.185 1.369-.487 1.961a5 5 0 0 1-2.185 2.185c-.592.302-1.232.428-1.961.487C17.1 21 16.227 21 15.143 21H8.857c-1.084 0-1.958 0-2.666-.058-.728-.06-1.369-.185-1.96-.487a5 5 0 0 1-2.186-2.185c-.302-.592-.428-1.232-.487-1.961C1.5 15.6 1.5 14.727 1.5 13.643v-3.286c0-1.084 0-1.958.058-2.666.06-.728.185-1.369.487-1.96A5 5 0 0 1 4.23 3.544c.592-.302 1.233-.428 1.961-.487C6.9 3 7.773 3 8.857 3M6.354 5.051c-.605.05-.953.142-1.216.276a3 3 0 0 0-1.311 1.311c-.134.263-.226.611-.276 1.216-.05.617-.051 1.41-.051 2.546v3.2c0 1.137 0 1.929.051 2.546.05.605.142.953.276 1.216a3 3 0 0 0 1.311 1.311c.263.134.611.226 1.216.276.617.05 1.41.051 2.546.051h.6V5h-.6c-1.137 0-1.929 0-2.546.051M11.5 5v14h3.6c1.137 0 1.929 0 2.546-.051.605-.05.953-.142 1.216-.276a3 3 0 0 0 1.311-1.311c.134-.263.226-.611.276-1.216.05-.617.051-1.41.051-2.546v-3.2c0-1.137 0-1.929-.051-2.546-.05-.605-.142-.953-.276-1.216a3 3 0 0 0-1.311-1.311c-.263-.134-.611-.226-1.216-.276C17.029 5.001 16.236 5 15.1 5zM5 8.5a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1M5 12a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </span>
+            <span class="flex" data-state="closed">
+                <button class="h-10 rounded-lg px-2 text-token-text-secondary focus-visible:outline-0 hover:bg-token-sidebar-surface-secondary focus-visible:bg-token-sidebar-surface-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" class="icon-xl-heavy">
+                        <path d="M15.673 3.913a3.121 3.121 0 1 1 4.414 4.414l-5.937 5.937a5 5 0 0 1-2.828 1.415l-2.18.31a1 1 0 0 1-1.132-1.13l.311-2.18A5 5 0 0 1 9.736 9.85zm3 1.414a1.12 1.12 0 0 0-1.586 0l-5.937 5.937a3 3 0 0 0-.849 1.697l-.123.86.86-.122a3 3 0 0 0 1.698-.849l5.937-5.937a1.12 1.12 0 0 0 0-1.586M11 4A1 1 0 0 1 10 5c-.998 0-1.702.008-2.253.06-.54.052-.862.141-1.109.267a3 3 0 0 0-1.311 1.311c-.134.263-.226.611-.276 1.216C5.001 8.471 5 9.264 5 10.4v3.2c0 1.137 0 1.929.051 2.546.05.605.142.953.276 1.216a3 3 0 0 0 1.311 1.311c.263.134.611.226 1.216.276.617.05 1.41.051 2.546.051h3.2c1.137 0 1.929 0 2.546-.051.605-.05.953-.142 1.216-.276a3 3 0 0 0 1.311-1.311c.126-.247.215-.569.266-1.108.053-.552.06-1.256.06-2.255a1 1 0 1 1 2 .002c0 .978-.006 1.78-.069 2.442-.064.673-.192 1.27-.475 1.827a5 5 0 0 1-2.185 2.185c-.592.302-1.232.428-1.961.487C15.6 21 14.727 21 13.643 21h-3.286c-1.084 0-1.958 0-2.666-.058-.728-.06-1.369-.185-1.96-.487a5 5 0 0 1-2.186-2.185c-.302-.592-.428-1.233-.487-1.961C3 15.6 3 14.727 3 13.643v-3.286c0-1.084 0-1.958.058-2.666.06-.729.185-1.369.487-1.961A5 5 0 0 1 5.73 3.545c.556-.284 1.154-.411 1.827-.475C8.22 3.007 9.021 3 10 3A1 1 0 0 1 11 4"></path>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul>
+            <li th:each="letter : ${letters}"
+                th:text="${letter.title}"
+                th:onclick="'loadLetter(' + ${letter.id} + ')' "
+                class="cursor-pointer p-2 hover:bg-gray-200 rounded">
+            </li>
+        </ul>
+    </div>
+
+    <!-- 右侧内容区 -->
+    <div class="flex-1 flex flex-col bg-white p-4">
+        <div class="flex flex-1">
+            <!-- 右侧：推荐信编辑器模块 -->
+            <div class="flex-1 p-4 border-r">
+                <div class="flex items-center justify-between mb-4"> <!-- 新增容器用于布局 -->
+                    <h2 class="text-2xl font-semibold">Edit Your Letter with AI!</h2>
+                    <div>
+                        <button id="saveBtn" class="bg-green-500 text-white py-2 px-4 rounded">Export</button> <!-- 保存按钮 -->
+                        <button id="signPdfBtn" class="bg-blue-500 text-white py-2 px-4 rounded ml-2">Sign and Export</button> <!-- 新增签名按钮 -->
+                    </div>
+                </div>
+                <iframe id="etherpad" src="index.html" width="100%" height="90%"></iframe>
+                <button id="generateAiBtn" class="mt-4 w-full bg-green-500 text-white py-2 rounded">Generate by AI</button>
+            </div>
+            <div class="w-1/4 p-4 flex flex-col"> <!-- 设置 flex-col  以使用 flexbox 布局 -->
+                <h2 class="text-2xl font-semibold mb-4">AI Conversation</h2>
+                <div id="aiResponse" class="flex-1 p-4 border mb-4">
+                    <!-- AI 回复内容将显示在这里 -->
+                </div>
+                <form id="sendForm" class="flex items-center mt-auto"> <!-- 使用 mt-auto 将表单推到底部 -->
+                    <input type="text" name="message" id="message" placeholder="给AI发送消息..." class="flex-1 p-3 border rounded-full pr-16">
+                    <button type="submit" class="bg-purple-500 text-white p-3 rounded-full ml-2">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="infoModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <!-- Background overlay -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"></span>
+        <!-- Modal Content -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full" style="margin: 20px; max-height: 90vh; overflow-y: auto;">
+            <!-- Modal Header with Navigation -->
+            <div class="bg-gray-100 px-4 py-3 border-b border-gray-300 text-lg leading-6 font-bold">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-gray-900">Recommendation Form</h3>
+                    <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="closeModal()">×</button>
+                </div>
+                <div class="flex justify-center space-x-4 mt-2">
+                    <button class="px-6 py-2 text-white bg-purple-500 rounded-full hover:bg-purple-600 focus:outline-none" id="showPage1">Basic Information</button>
+                    <button class="px-6 py-2 text-white bg-purple-500 rounded-full hover:bg-purple-600 focus:outline-none" id="showPage2">Brief Overview</button>
+                    <button class="px-6 py-2 text-white bg-purple-500 rounded-full hover:bg-purple-600 focus:outline-none" id="showPage3">Detailed Overview</button>
+                </div>
+            </div>
+            <!-- Modal Body -->
+            <div class="flex-grow p-6">
+                <!-- Basic Information -->
+                <div id="page1" class="page-content">
+                    <form id = "newLetterForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-1">Recommendee Name</label>
+                                <input type="text" name="recommendeeName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Recommender Name</label>
+                                <input type="text" name="recommenderName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Gender</label>
+                                <select name="gender" class="w-full p-2 border border-gray-300 rounded-md">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Position</label>
+                                <input type="text" name="position" placeholder="Enter Position" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Phone</label>
+                                <input type="text" name="phone" placeholder="Enter Phone Number" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Email</label>
+                                <input type="email" name="email" placeholder="Enter Email Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Organization</label>
+                                <input type="text" name="organization" placeholder="Enter Organization" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Address</label>
+                                <input type="text" name="address" placeholder="Enter Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Major</label>
+                                <input type="text" name="major" placeholder="Enter Major" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Brief Overview -->
+                <div id="page2" class="page-content hidden">
+                    <form id = "newLetterForm2">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block mb-1">Describe your (the recommendee's) personality</label>
+                                <textarea name="personality" rows="3" placeholder="Describe Personality" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+                            <div>
+                                <label class="block mb-1">How long have you known the recommender?</label>
+                                <input type="text" name="acquaintanceTime" placeholder="Enter Duration" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">What event led to your acquaintance? (Describe the course or the research project you join)</label>
+                                <input type="text" name="acquaintanceEvent" placeholder="Describe Event" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Which abilities is the recommender primarily recommending you for?</label>
+                                <textarea name="abilities" rows="3" placeholder="Describe Abilities" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Detailed Overview -->
+                <div id="page3" class="page-content hidden">
+                    <form id = "newLetterForm3">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block mb-1">Please provide examples to support the abilities the recommender is recommending you for, such as projects you've worked on together.</label>
+                                <textarea name="examples" rows="4" placeholder="Provide Details" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Please provide some details about the recommender that can be used as reference material for the recommendation letter.</label>
+                                <textarea name="refereeDetails" rows="4" placeholder="Describe Recommender Details" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Please select the tone of the recommendation letter:</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="relative flex items-start">
+                                        <div class="flex h-6 items-center">
+                                            <input id="mature" aria-describedby="mature-description" name="languageLevel" type="checkbox" value="Mature and stable" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                        </div>
+                                        <div class="ml-3 leading-6">
+                                            <label for="mature" class="font-medium text-gray-900">Mature and stable</label>
+                                            <span id="mature-description" class="text-gray-500"><span class="sr-only">Mature and stable, </span>with a plain and objective tone.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative flex items-start">
+                                        <div class="flex h-6 items-center">
+                                            <input id="exaggerated" aria-describedby="exaggerated-description" name="languageLevel" type="checkbox" value="Exaggerated tone" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                        </div>
+                                        <div class="ml-3 leading-6">
+                                            <label for="exaggerated" class="font-medium text-gray-900">Exaggerated tone</label>
+                                            <span id="exaggerated-description" class="text-gray-500"><span class="sr-only">Exaggerated tone, </span>showing deep knowledge and strong willingness to recommend.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative flex items-start">
+                                        <div class="flex h-6 items-center">
+                                            <input id="neutral" aria-describedby="neutral-description" name="languageLevel" type="checkbox" value="Neutral tone" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                        </div>
+                                        <div class="ml-3 leading-6">
+                                            <label for="neutral" class="font-medium text-gray-900">Neutral tone</label>
+                                            <span id="neutral-description" class="text-gray-500"><span class="sr-only">Neutral tone, </span>recommender doesn’t know you well but is willing to recommend.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative flex items-start">
+                                        <div class="flex h-6 items-center">
+                                            <input id="any" aria-describedby="any-description" name="languageLevel" type="checkbox" value="Any tone" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                        </div>
+                                        <div class="ml-3 leading-6">
+                                            <label for="any" class="font-medium text-gray-900">Any tone</label>
+                                            <span id="any-description" class="text-gray-500"><span class="sr-only">Any tone </span>is fine; write based on the information provided.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative flex items-start">
+                                        <div class="flex h-6 items-center">
+                                            <input id="other" aria-describedby="other-description" name="languageLevel" type="checkbox" value="Other specific requirements" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                        </div>
+                                        <div class="ml-3 leading-6">
+                                            <label for="other" class="font-medium text-gray-900">Other specific requirements</label>
+                                            <input type="text" name="otherRequirements" placeholder="Describe Requirements" class="w-full p-2 border border-gray-300 rounded-md mt-1">
+                                            <span id="other-description" class="text-gray-500"><span class="sr-only">Other specific requirements: </span>describe your needs.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm" id="submitModal">Submit</button>
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" id="closeModal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="infoModal1" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <!-- Background overlay -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"></span>
+        <!-- Modal Content -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full" style="margin: 20px; max-height: 90vh; overflow-y: auto;">
+            <!-- Modal Header with Navigation -->
+            <div class="bg-gray-100 px-4 py-3 border-b border-gray-300 text-lg leading-6 font-bold">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-gray-900">Please input your basic information so that we can generate the proper template</h3>
+                    <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="closeModal1()">×</button>
+                </div>
+            </div>
+            <!-- Modal Body -->
+            <div class="flex-grow p-6">
+                <!-- Basic Information -->
+                <div id="page4" class="page-content">
+                    <form id = "newLetterForm1">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-1">Recommendee Name</label>
+                                <input type="text" name="recommendeeName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Recommender Name</label>
+                                <input type="text" name="recommenderName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Gender</label>
+                                <select name="gender" class="w-full p-2 border border-gray-300 rounded-md">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Position</label>
+                                <input type="text" name="position" placeholder="Enter Position" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Phone</label>
+                                <input type="text" name="phone" placeholder="Enter Phone Number" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Email</label>
+                                <input type="email" name="email" placeholder="Enter Email Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Organization</label>
+                                <input type="text" name="organization" placeholder="Enter Organization" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Address</label>
+                                <input type="text" name="address" placeholder="Enter Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Major</label>
+                                <input type="text" name="major" placeholder="Enter Major" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm" id="submitModal1">Submit</button>
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" id="closeModal1">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="infoModal2" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <!-- Background overlay -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"></span>
+        <!-- Modal Content -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full" style="margin: 20px; max-height: 90vh; overflow-y: auto;">
+            <!-- Modal Header with Navigation -->
+            <div class="bg-gray-100 px-4 py-3 border-b border-gray-300 text-lg leading-6 font-bold">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-gray-900">Please input your basic information first so that we can generate the proper template, then click submit</h3>
+                    <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="closeModal2()">×</button>
+                </div>
+            </div>
+            <!-- Modal Body -->
+            <div class="flex-grow p-6">
+                <!-- Basic Information -->
+                <div id="page5" class="page-content">
+                    <form id = "sigForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-1">Recommendee Name</label>
+                                <input type="text" name="recommendeeName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Recommender Name</label>
+                                <input type="text" name="recommenderName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Gender</label>
+                                <select name="gender" class="w-full p-2 border border-gray-300 rounded-md">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Position</label>
+                                <input type="text" name="position" placeholder="Enter Position" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Phone</label>
+                                <input type="text" name="phone" placeholder="Enter Phone Number" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Email</label>
+                                <input type="email" name="email" placeholder="Enter Email Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Organization</label>
+                                <input type="text" name="organization" placeholder="Enter Organization" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Address</label>
+                                <input type="text" name="address" placeholder="Enter Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Major</label>
+                                <input type="text" name="major" placeholder="Enter Major" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm" id="submitModal2">Submit</button>
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" id="closeModal2">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 签名上传模态框 -->
+<div id="signatureModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"></span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-gray-100 px-4 py-3 border-b border-gray-300 text-lg leading-6 font-bold">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-gray-900">Upload or Draw Signature</h3>
+                    <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="closeSignatureModal()">×</button>
+                </div>
+            </div>
+            <div class="bg-white px-4 py-5 sm:p-6">
+                <div class="mb-4">
+                    <input type="file" id="signatureUpload" accept="image/*" class="mb-4">
+                    <p class="text-gray-600">Or draw your signature below:</p>
+                    <canvas id="signatureCanvas" class="border w-full h-48"></canvas>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none sm:w-auto sm:text-sm" onclick="submitSignature()">Submit</button>
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeSignatureModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function closeModal() {
+        document.getElementById('infoModal').classList.add('hidden');
+    }
+
+    function closeModal1() {
+        document.getElementById('infoModal1').classList.add('hidden');
+    }
+
+    function closeModal2() {
+        document.getElementById('infoModal2').classList.add('hidden');
+    }
+    function loadLetter(letterId) {
+        // 加载选中的推荐信内容
+        fetch(`/letters/${letterId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('letterContent').innerText = data.content;
+            });
+    }
+</script>
+
+<script>
+    $(document).ready(function(){
+        // 绑定提交按钮点击事件
+        $('#submitModal2').click(function() {
+            $('#sigForm').submit();
+        });
+
+        // 表单提交事件处理
+        $('#sigForm').submit(function(event) {
+            event.preventDefault();
+            // 获取第一个表单的数据
+            var formData1 = $(this).serializeArray();
+
+            // 保存表单数据到 sessionStorage
+            sessionStorage.setItem('formData', JSON.stringify(formData1));
+
+            // 关闭模态框
+            $('#infoModal2').addClass('hidden');
+
+            // 继续执行保存逻辑，调用保存按钮的点击事件
+            $('#signPdfBtn').click();
+        });
+    });
+
+    document.getElementById('signPdfBtn').addEventListener('click', function() {
+        document.getElementById('signatureModal').classList.remove('hidden');
+    });
+
+    // 关闭模态框
+    function closeSignatureModal() {
+        document.getElementById('signatureModal').classList.add('hidden');
+    }
+    function getBase64(file, callback) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            callback(reader.result);
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    function submitSignature() {
+        var canvas = document.getElementById('signatureCanvas');
+        var signatureUpload = document.getElementById('signatureUpload');
+        var formData = JSON.parse(sessionStorage.getItem('formData'));
+        var padId = sessionStorage.getItem('padId');
+
+        if (!padId) {
+            alert('未找到保存的数据');
+        }
+
+        if (!formData) {
+            $('#infoModal2').removeClass('hidden');
+            $('#signatureModal').addClass('hidden');
+        }
+
+        // 添加 padId 到表单数据中
+        formData.padId = padId;
+
+        if (signatureUpload.files.length > 0) {
+            // 如果用户上传了图片，将其转换为 Base64 并处理
+            getBase64(signatureUpload.files[0], function(base64Data) {
+                formData.signature = base64Data;
+                sendFormDataToServer(formData);
+            });
+        } else {
+            // 如果用户使用画布绘制签名，则将画布转换为 Base64 并处理
+            canvas.toBlob(function(blob) {
+                getBase64(blob, function(base64Data) {
+                    formData.signature = base64Data;
+                    sendFormDataToServer(formData,base64Data);
+                });
+            });
+        }
+    }
+
+    function sendFormDataToServer(formData,base64Data) {
+        // 将 formData 转换为 URL 编码的字符串
+        // 从 sessionStorage 获取存储的数据
+        var formData1 = JSON.parse(sessionStorage.getItem('formData'));
+        var padId = sessionStorage.getItem('padId');
+        var encodedBase64 = encodeURIComponent(base64Data);
+        if (padId) {
+            if (formData1) {
+                // 添加 padId 到表单数据中
+                formData1.padId = padId;
+
+                // 转换 formData 为 URL 编码的字符串
+                var urlEncodedData = $.param(formData) + "&padId=" + padId +"&signature=" + encodedBase64;
+                alert(urlEncodedData);
+
+                // 使用 POST 请求将数据发送到后端保存
+                $.ajax({
+                    url: '/export/pdfWithSignature',
+                    method: 'POST',
+                    data: urlEncodedData, // 发送 URL 编码的数据
+                    processData: false, // 不处理数据
+                    contentType: 'application/x-www-form-urlencoded', // 设置 contentType 为 URL 编码格式
+                    xhrFields: {
+                        responseType: 'blob' // 指定响应类型为 Blob
+                    },
+                    success: function(response, status, xhr) {
+                        // 从响应头中获取文件名
+                        var disposition = xhr.getResponseHeader('Content-Disposition');
+                        var filename = 'signed_document.pdf'; // 默认文件名
+                        if (disposition && disposition.indexOf('filename=') !== -1) {
+                            filename = disposition.split('filename=')[1].trim().replace(/"/g, '');
+                        }
+
+                        // 创建一个 Blob 对象
+                        var blob = new Blob([response], { type: 'application/pdf' });
+
+                        // 创建一个下载链接
+                        var downloadUrl = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = downloadUrl;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(downloadUrl);
+
+                        // 提示保存成功
+                        alert('签名的 PDF 文件已保存并下载！');
+                        closeSignatureModal();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        // 提示保存失败
+                        alert('保存失败，请重试');
+                        console.error("Error: " + textStatus + ", " + errorThrown);
+                    }
+                });
+            } else {
+                // 如果没有 formData，则显示模态框，要求用户填写基本信息
+                $('#infoModal2').removeClass('hidden');
+                $('#signatureModal').addClass('hidden');
+            }
+        } else {
+            alert('未找到保存的数据');
+        }
+    }
+
+    // 用于签名的画布初始化
+    var canvas = document.getElementById('signatureCanvas');
+    var ctx = canvas.getContext('2d');
+    var drawing = false;
+
+    canvas.addEventListener('mousedown', function(e) {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mousemove', function(e) {
+        if (drawing) {
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        }
+    });
+
+    canvas.addEventListener('mouseup', function() {
+        drawing = false;
+    });
+
+    canvas.addEventListener('mouseleave', function() {
+        drawing = false;
+    });
+
+</script>
+<script>
+    // 模态框选择
+
+    document.getElementById('showPage1').addEventListener('click', function() {
+        document.getElementById('page1').classList.remove('hidden');
+        document.getElementById('page2').classList.add('hidden');
+        document.getElementById('page3').classList.add('hidden');
+    });
+
+    document.getElementById('showPage2').addEventListener('click', function() {
+        document.getElementById('page1').classList.add('hidden');
+        document.getElementById('page2').classList.remove('hidden');
+        document.getElementById('page3').classList.add('hidden');
+    });
+
+    document.getElementById('showPage3').addEventListener('click', function() {
+        document.getElementById('page1').classList.add('hidden');
+        document.getElementById('page2').classList.add('hidden');
+        document.getElementById('page3').classList.remove('hidden');
+    });
+</script>
+
+<script>
+    $(document).ready(function(){
+        // 显示模态框
+        $('#generateAiBtn').click(function() {
+            $('#infoModal').removeClass('hidden');
+        });
+
+        // 关闭模态框
+        $('#closeModal').click(function() {
+            $('#infoModal').addClass('hidden');
+        });
+
+        // 绑定提交按钮点击事件1
+        $('#submitModal').click(function() {
+            $('#newLetterForm').submit();
+        });
+
+        // 关闭模态框1
+        $('#closeModal1').click(function() {
+            $('#infoModal1').addClass('hidden');
+        });
+        // 绑定提交按钮点击事件1
+        $('#submitModal1').click(function() {
+            $('#newLetterForm1').submit();
+        });
+
+
+
+        // 表单提交事件处理
+        $('#newLetterForm').submit(function(event) {
+            event.preventDefault();
+            // 获取第一个表单的数据
+            var formData1 = $(this).serializeArray();
+
+            // 获取第二个表单的数据
+            var formData2 = $('#newLetterForm2').serializeArray();
+
+            // 获取第三个表单的数据
+            var formData3 = $('#newLetterForm3').serializeArray();
+
+            // 将所有表单数据合并到一个对象
+            var mergedData = {};
+            formData1.forEach(function(item) {
+                mergedData[item.name] = item.value;
+            });
+            formData2.forEach(function(item) {
+                mergedData[item.name] = item.value;
+            });
+            formData3.forEach(function(item) {
+                mergedData[item.name] = item.value;
+            });
+
+            $.post('/generate_letter', mergedData, function(response) {
+                // 提交成功后的提示
+                alert('提交成功，正在加载内容...');
+                var padId = response.padId;
+                var iframe = document.getElementById('etherpad');
+                // 在创建 Pad 并获取 padId 后，将其传递给子页面
+                iframe.onload = function() {
+                    // 通过 postMessage 将 padId 发送到子页面
+                    iframe.contentWindow.postMessage({ padId: padId }, '*');
+                };
+                // 设置 iframe 的 src，并触发 onload 事件
+                iframe.src = 'index.html';
+                // 保存表单数据和 padId 到 sessionStorage
+                sessionStorage.setItem('formData', JSON.stringify(formData1));
+                sessionStorage.setItem('padId', response.padId);
+                $('#infoModal').addClass('hidden');
+                $('#etherpad').removeClass('hidden');
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                // 提交失败后的提示
+                alert('提交失败，请重试');
+                console.error("Error: " + textStatus + ", " + errorThrown);
+            });
+        });
+        // 表单提交事件处理1
+        $(document).ready(function(){
+            // 绑定提交按钮点击事件
+            $('#submitModal1').click(function() {
+                $('#newLetterForm1').submit();
+            });
+
+            // 表单提交事件处理
+            $('#newLetterForm1').submit(function(event) {
+                event.preventDefault();
+                // 获取第一个表单的数据
+                var formData1 = $(this).serializeArray();
+
+                // 保存表单数据到 sessionStorage
+                sessionStorage.setItem('formData', JSON.stringify(formData1));
+
+                // 关闭模态框
+                $('#infoModal1').addClass('hidden');
+
+                // 继续执行保存逻辑，调用保存按钮的点击事件
+                $('#saveBtn').click();
+            });
+        });
+
+        // ai 对话
+        $('#sendForm').on('submit', function(event){
+            event.preventDefault();
+            var message = $('#message').val();
+            $('#aiResponse').text(''); // 清空之前的回复内容
+
+            var eventSource = new EventSource('/ai_prompt?message=' + message);
+            var responseElement = $('#aiResponse');
+            var textBuffer = ''; // 缓冲区来收集所有的数据块
+            var index = 0;
+            var isAppending = false; // 标志位，防止重复调用 displayNextCharacter
+
+            eventSource.onmessage = function(event) {
+                textBuffer += event.data; // 收集数据块
+
+                if (!isAppending) {
+                    isAppending = true;
+                    function displayNextCharacter() {
+                        if (index < textBuffer.length) {
+                            if (textBuffer.charAt(index) === '\n') {
+                                responseElement.append('<br>'); // 遇到换行符时插入换行
+                            } else {
+                                responseElement.append(textBuffer.charAt(index));
+                            }
+                            index++;
+                            setTimeout(displayNextCharacter, 50); // 调整字符显示的速度（50ms）
+                        } else {
+                            isAppending = false; // 允许下一次的字符显示
+                        }
+                    }
+                    displayNextCharacter();
+                }
+            };
+
+            eventSource.onerror = function() {
+                eventSource.close();
+            };
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('saveBtn').addEventListener('click', function() {
+        // 从 sessionStorage 获取存储的数据
+        var formData = JSON.parse(sessionStorage.getItem('formData'));
+        var padId = sessionStorage.getItem('padId');
+
+        if (padId) {
+            if (formData) {
+                // 添加 padId 到表单数据中
+                formData.padId = padId;
+
+                // 转换 formData 为 URL 编码的字符串
+                var urlEncodedData = $.param(formData) + "&padId=" + padId;
+
+                // 使用 POST 请求将数据发送到后端保存
+                $.ajax({
+                    url: '/export/pdf',
+                    method: 'POST',
+                    data: urlEncodedData,
+                    processData: false, // 不处理数据
+                    contentType: 'application/x-www-form-urlencoded', // 设置 Content-Type
+                    xhrFields: {
+                        responseType: 'blob' // 指定响应类型为 Blob
+                    },
+                    success: function(response, status, xhr) {
+                        // 从响应头中获取文件名
+                        var disposition = xhr.getResponseHeader('Content-Disposition');
+                        var filename = 'document.pdf'; // 默认文件名
+                        if (disposition && disposition.indexOf('filename=') !== -1) {
+                            filename = disposition.split('filename=')[1].trim().replace(/"/g, '');
+                        }
+
+                        // 创建一个 Blob 对象
+                        var blob = new Blob([response], { type: 'application/pdf' });
+
+                        // 创建一个下载链接
+                        var downloadUrl = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = downloadUrl;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(downloadUrl);
+
+                        // 提示保存成功
+                        alert('PDF 文件已保存并下载！');
+                        console.log('Extracted filename:', filename);
+                        console.log('Response content:', response);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        // 提示保存失败
+                        alert('保存失败，请重试');
+                        console.error("Error: " + textStatus + ", " + errorThrown);
+                    }
+                });
+            } else {
+                // 如果没有 formData，则显示模态框，要求用户填写基本信息
+                $('#infoModal1').removeClass('hidden');
+            }
+        } else {
+            alert('未找到保存的数据');
+        }
+    });
+</script>
+</body>
+</html>

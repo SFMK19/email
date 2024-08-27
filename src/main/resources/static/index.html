@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Etherpad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glassmorphism {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #result {
+            font-size: 1.2em;
+        }
+
+        /* Button hover animation */
+        #createBtn:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+<div class="glassmorphism p-8 text-center max-w-md mx-auto">
+    <h1 class="text-2xl  text-white mb-4">Create a New Recommendation letter</h1>
+    <input id="padIdInput" type="text" placeholder="Enter Pad ID (optional)"
+           class="w-full p-3 mb-4 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+    <button id="createBtn"
+            class="w-full p-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+        Create New Pad
+    </button>
+    <div id="result" class="mt-4 text-white"></div>
+</div>
+
+<script>
+    document.getElementById('createBtn').addEventListener('click', function() {
+        var padId = document.getElementById('padIdInput').value;
+
+        // 发送请求到后端
+        fetch('/createPad', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                'padId': padId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.padId) {
+                    // 保存 padId 到 sessionStorage
+                    sessionStorage.setItem('padId', data.padId);
+                    // 自动打开新创建的 Pad
+                    window.location.href = data.url;
+                } else {
+                    document.getElementById('result').innerHTML = 'Error creating pad: ' + data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 'Error creating pad: ' + error.message;
+            });
+    });
+</script>
+
+<script>
+    // 监听来自父页面的消息
+    window.addEventListener('message', function(event) {
+        // 确保接收到的数据是正确的
+        var padId = event.data.padId;
+        if (padId) {
+            // alert(padId);
+            // 发送请求到后端
+            fetch('/createPad', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'padId': padId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.padId) {
+                        // 保存 padId 到 sessionStorage
+                        sessionStorage.setItem('padId', data.padId);
+                        // 自动打开新创建的 Pad
+                        window.location.href = data.url;
+                    } else {
+                        document.getElementById('result').innerHTML = 'Error creating pad: ' + data.message;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').innerHTML = 'Error creating pad: ' + error.message;
+                });
+        }
+    });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Recommendation Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <style>
+        .fade-in-section {
+        opacity: 0;
+        transform: translateY(100px); /* 增加初始的Y轴偏移量 */
+        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.55, 0.72),
+        transform 0.3s cubic-bezier(0.47, 0, 0.75, 0.72);
+    }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="bg-white dark:bg-gray-950 transition-colors duration-500">
+    <!--
+  Mobile menu 还没适配
+
+  Off-canvas menu for mobile, show/hide based on off-canvas menu state.
+-->
+    <div id="header-modal" class="hidden relative z-40 lg:hidden" role="dialog" aria-modal="true">
+        <!--
+          Off-canvas menu backdrop, show/hide based on off-canvas menu state.
+
+          Entering: "transition-opacity ease-linear duration-300"
+            From: "opacity-0"
+            To: "opacity-100"
+          Leaving: "transition-opacity ease-linear duration-300"
+            From: "opacity-100"
+            To: "opacity-0"
+        -->
+        <div class="fixed inset-0 bg-black bg-opacity-25"></div>
+
+        <div class="fixed inset-0 z-40 flex">
+
+            <div class="relative flex w-full max-w-xs flex-col overflow-y-auto bg-white pb-12 shadow-xl">
+                <div class="flex px-4 pb-2 pt-5">
+                    <button id="menu-close-btn" type="button" class="-m-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400">
+                        <span class="sr-only">Close menu</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Links -->
+                <div class="mt-2">
+                    <div class="border-b border-gray-200">
+                        <div class="-mb-px flex space-x-8 px-4" aria-orientation="horizontal" role="tablist">
+                            <!-- Selected: "border-indigo-600 text-indigo-600", Not Selected: "border-transparent text-gray-900" -->
+                            <a href="subPage/Product/ProductList.html" id="tabs-1-tab-1" class="border-transparent text-gray-900 flex-1 whitespace-nowrap border-b-2 px-1 py-4 text-base font-medium" aria-controls="tabs-1-panel-1" role="tab" type="button">Match</a>
+                            <!-- Selected: "border-indigo-600 text-indigo-600", Not Selected: "border-transparent text-gray-900" -->
+                            <a href="javascript:void(0);" id="tabs-1-tab-2" class="border-transparent text-gray-900 flex-1 whitespace-nowrap border-b-2 px-1 py-4 text-base font-medium" aria-controls="tabs-1-panel-2" role="tab" type="button" onclick="sendTokenRequest('./subPage/Product/ProductList')">Match</a>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="space-y-6 border-t border-gray-200 px-4 py-6">
+                    <div class="flow-root">
+                        <a href="/add_user" class="-m-2 block p-2 font-medium text-gray-900">Create an account</a>
+                    </div>
+                    <div class="flow-root">
+                        <a href="/log_in" class="-m-2 block p-2 font-medium text-gray-900">Sign in</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <header class="fixed top-0 left-0 w-full z-30">
+        <nav aria-label="Top">
+            <!-- Secondary navigation -->
+            <div class="bg-white dark:bg-gray-800 transition-colors duration-300">
+                <div class="border-b border-gray-200 dark:border-black">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="flex h-16 items-center justify-between">
+                            <!-- Logo (lg+) -->
+                            <div class="hidden lg:flex lg:items-center">
+                                <a href="#">
+                                    <span class="sr-only">Recommendation system</span>
+                                    <img class="h-10 w-auto" src="./images/logo.png" alt="">
+                                </a>
+                            </div>
+
+                            <div class="hidden h-full lg:flex">
+                                <!-- Mega menus -->
+                                <div class="ml-8">
+                                    <div class="flex h-full justify-center space-x-8">
+                                        <div class="flex">
+                                            <div class="relative flex">
+                                                <!-- Item active: "border-indigo-600 text-indigo-600", Item inactive: "border-transparent text-gray-700 hover:text-gray-800" -->
+                                                <a href="#" type="button" class="border-transparent text-purple-600 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out" aria-expanded="false">Home</a>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile menu and search (lg-) -->
+                            <div class="flex flex-1 items-center lg:hidden">
+                                <!-- Mobile menu toggle, controls the 'mobileMenuOpen' state. -->
+                                <button id="mobile-menu-btn" type="button" class="-ml-2 rounded-md bg-white p-2 text-gray-400 dark:bg-gray-950">
+                                    <span class="sr-only">Open menu</span>
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                    </svg>
+                                </button>
+
+                                <!-- Search -->
+                                <a href="subPage/Search.html" class="ml-2 p-2 text-gray-400 hover:text-gray-500">
+                                    <span class="sr-only">Search</span>
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <!-- Logo (lg-) -->
+                            <a href="#" class="lg:hidden">
+                                <span class="sr-only">Easy Eat</span>
+                                <img src="images/logo.png" alt="" class="h-8 w-auto">
+                            </a>
+
+                            <div class="flex flex-1 items-center justify-end">
+                                <div class="flex items-center lg:ml-8">
+
+                                    <div class="hidden lg:flex">
+                                        <a href="subPage/Search.html" class="-m-2 p-2 text-gray-400 hover:text-gray-500">
+                                            <span class="sr-only">Search</span>
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+
+                                    <span class="mx-x h-6 w-px lg:mx-6" aria-hidden="true"></span>
+
+                                    <div class="flow-root">
+
+                                        <button id="translateLanguage" class="p-2 rounded-2xl bg-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 dark:bg-gray-700" onclick="window.location.href = 'index_chinese.html';">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                                            </svg>
+                                        </button>
+
+                                    </div>
+
+                                    <span class="mx-x h-6 w-px lg:mx-3" aria-hidden="true"></span>
+
+                                    <div class="flow-root">
+
+                                        <button id="toggleDarkMode" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-300 dark:bg-gray-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 text-gray-800 dark:text-gray-200">
+                                                <!-- Sun Icon -->
+                                                <g class="dark:hidden">
+                                                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.485-7.071l1.414 1.414M6.343 17.657l1.414-1.414m12.728 0l-1.414-1.414M6.343 6.343L4.93 7.757"/>
+                                                </g>
+                                                <!-- Moon Icon -->
+                                                <g class="hidden dark:block">
+                                                    <path fill="currentColor" d="M21 12.795A9.004 9.004 0 0012.205 3a7.5 7.5 0 018.8 8.8 9.005 9.005 0 00-.005 1.995z"/>
+                                                </g>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+
+
+                                    <span class="mx-4 h-6 w-px bg-gray-200 lg:mx-6" aria-hidden="true"></span>
+
+
+                                    <div id="signup-buttons" class="flex space-x-8 px-4">
+                                        <a href="/log_in" type="button" class="rounded-md bg-white dark:bg-gray-600 px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-950 hover:bg-gray-50 dark:hover:bg-gray-700">Sign up</a>
+
+                                        <a href="/add_user" type="button" class="rounded-md bg-purple-500 dark:bg-purple-700 px-2.5 py-1.5 text-sm font-semibold text-white dark:text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</a>
+                                    </div>
+
+                                    <div id="user-links" class="hidden flex space-x-8 px-4">
+
+
+
+                                        <div class="flex space-x-8">
+
+                                            <div class="flex">
+                                                <!-- Trigger Button -->
+                                                <button onclick="toggleDropdown()" class="-m-2 p-2 text-gray-400 hover:text-gray-500 focus:outline-none">
+                                                    <span class="sr-only">Account</span>
+                                                    <img class="inline-block h-10 w-10 rounded-full" src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?size=626&ext=jpg" alt="">
+                                                </button>
+
+                                                <!-- Dropdown Menu -->
+                                                <div id="dropdownMenu" class="hidden absolute right-[0px] z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none dark:bg-gray-950" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                                    <a href="#" class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-white" role="menuitem" tabindex="-1" id="user-menu-item-0">Your profile</a>
+                                                    <button onclick="logout()" class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-white" role="menuitem" tabindex="-1" id="user-menu-item-1">Sign out</button>
+                                                    <button onclick="closeDropdown()" class="content-center block w-full text-right px-3 py-1 text-gray-400 hover:text-gray-500">
+                                                        <span class="sr-only">Close</span>
+                                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero -->
+
+        <div class="flex flex-col border-b border-gray-200 lg:border-0">
+            <div class="relative">
+                <div aria-hidden="true" class="absolute hidden h-full w-1/2 bg-purple-100 dark:bg-purple-300 lg:block transition-colors duration-300"></div>
+                <div class="relative bg-gray-100 lg:bg-transparent">
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:grid lg:grid-cols-2 lg:px-8">
+                        <div class="mx-auto max-w-2xl py-24 lg:max-w-none lg:py-64">
+                            <div class="lg:pr-16">
+                                <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl xl:text-6xl">Smart Recommendations, Effortless Success</h1>
+                                <p class="mt-4 text-xl text-gray-600"> – Your AI-Powered Recommendation Letter Solution!</p>
+                                <div class="mt-6">
+                                    <a href="subPage/Product/Restaurant.html" class="inline-block rounded-md border border-transparent bg-purple-500 dark:bg-purple-600 px-8 py-3 font-medium text-white hover:bg-purple-600 transition-colors duration-300">Try Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-48 w-full sm:h-64 lg:absolute lg:right-0 lg:top-0 lg:h-full lg:w-1/2">
+                    <img src="homepage_tmp.jpg" alt="Platform related photo" class="object-cover h-full w-full">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Key1 intro -->
+
+        <div class="relative overflow-hidden fade-in-section">
+            <!-- Decorative background image and gradient -->
+            <div aria-hidden="true" class="absolute inset-0">
+                <div class="absolute inset-0 mx-auto max-w-7xl overflow-hidden xl:px-8">
+                    <img src="homepage_tmp2.jpg" alt="" class="h-full w-full object-cover object-center">
+                </div>
+                <div class="absolute inset-0 bg-white bg-opacity-90 dark:bg-black bg-opacity-10 transition-colors duration-300"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-white via-white dark:bg-gradient-to-t dark:from-black dark:via-black transition-colors duration-300"></div>
+            </div>
+
+            <!-- Sale -->
+
+            <section aria-labelledby="sale-heading" class="relative mx-auto flex max-w-7xl flex-col items-center px-4 pt-32 text-center sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl lg:max-w-none">
+                    <h2 id="sale-heading" class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-amber-500">Match</h2>
+                    <p class="mx-auto mt-4 max-w-xl text-xl text-gray-600 dark:text-white">Tailor your recommendation letter needs: teachers set detailed standards, students select preferences.
+                    </p>
+                    <a href="log_in" class="mt-6 inline-block w-full rounded-md border border-transparent bg-purple-500 px-8 py-3 font-medium text-white hover:bg-purple-600 sm:w-auto">Find your satisfied student/teacher now</a>
+                </div>
+            </section>
+
+            <!-- Testimonials -->
+            <section class="fade-in-section">
+                <section aria-labelledby="testimonial-heading" class="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+                    <div class="mx-auto max-w-2xl lg:max-w-none">
+                        <h2 id="testimonial-heading" class="text-2xl font-bold tracking-tight text-gray-900 dark:text-amber-500">What are our teachers/students saying?</h2>
+
+                        <div class="mt-16 space-y-16 lg:grid lg:grid-cols-3 lg:gap-x-8 lg:space-y-0">
+                            <blockquote class="sm:flex lg:block">
+                                <svg width="24" height="18" viewBox="0 0 24 18" aria-hidden="true" class="flex-shrink-0 text-gray-300">
+                                    <path d="M0 18h8.7v-5.555c-.024-3.906 1.113-6.841 2.892-9.68L6.452 0C3.188 2.644-.026 7.86 0 12.469V18zm12.408 0h8.7v-5.555C21.083 8.539 22.22 5.604 24 2.765L18.859 0c-3.263 2.644-6.476 7.86-6.451 12.469V18z" fill="currentColor" />
+                                </svg>
+                                <div class="mt-8 sm:ml-6 sm:mt-0 lg:ml-0 lg:mt-10">
+                                    <p class="text-lg text-gray-600 dark:text-white">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  </p>
+                                    <cite class="mt-4 block font-semibold not-italic text-gray-900 dark:text-white">Sarah Peters, SAT professor</cite>
+                                </div>
+                            </blockquote>
+                            <blockquote class="sm:flex lg:block">
+                                <svg width="24" height="18" viewBox="0 0 24 18" aria-hidden="true" class="flex-shrink-0 text-gray-300">
+                                    <path d="M0 18h8.7v-5.555c-.024-3.906 1.113-6.841 2.892-9.68L6.452 0C3.188 2.644-.026 7.86 0 12.469V18zm12.408 0h8.7v-5.555C21.083 8.539 22.22 5.604 24 2.765L18.859 0c-3.263 2.644-6.476 7.86-6.451 12.469V18z" fill="currentColor" />
+                                </svg>
+                                <div class="mt-8 sm:ml-6 sm:mt-0 lg:ml-0 lg:mt-10">
+                                    <p class="text-lg text-gray-600 dark:text-white">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                                    <cite class="mt-4 block font-semibold not-italic text-gray-900 dark:text-white">Kelly McPherson, IBSS</cite>
+                                </div>
+                            </blockquote>
+                            <blockquote class="sm:flex lg:block">
+                                <svg width="24" height="18" viewBox="0 0 24 18" aria-hidden="true" class="flex-shrink-0 text-gray-300">
+                                    <path d="M0 18h8.7v-5.555c-.024-3.906 1.113-6.841 2.892-9.68L6.452 0C3.188 2.644-.026 7.86 0 12.469V18zm12.408 0h8.7v-5.555C21.083 8.539 22.22 5.604 24 2.765L18.859 0c-3.263 2.644-6.476 7.86-6.451 12.469V18z" fill="currentColor" />
+                                </svg>
+                                <div class="mt-8 sm:ml-6 sm:mt-0 lg:ml-0 lg:mt-10">
+                                    <p class="text-lg text-gray-600 dark:text-white">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+                                    <cite class="mt-4 block font-semibold not-italic text-gray-900 dark:text-white">Chris Paul, ICS</cite>
+                                </div>
+                            </blockquote>
+                        </div>
+
+
+                    </div>
+                </section>
+            </section>
+
+
+        </div>
+
+        <!-- Key2: Enhanced Recommendation Generation -->
+        <div class="relative overflow-hidden fade-in-section bg-purple-700 text-white py-20 px-4 sm:px-6 lg:px-8">
+            <!-- Decorative background gradient -->
+            <div aria-hidden="true" class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-700 opacity-75"></div>
+            </div>
+
+            <section aria-labelledby="key2-heading" class="relative mx-auto max-w-7xl flex flex-col lg:flex-row items-center text-center lg:text-left">
+                <div class="lg:w-1/2">
+                    <h2 id="key2-heading" class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">Enhanced Recommendation Generation</h2>
+                    <p class="mt-4 text-xl">
+                        Improve recommendation letter generation with GPT3.5/4 by integrating 3.5 API. Program the API for more accurate letters.
+                    </p>
+                </div>
+                <div class="lg:w-1/2 mt-10 lg:mt-0 lg:pl-10">
+                    <div class="relative">
+                            <img src="homepage_tmp.jpg" alt="Enhanced Recommendation" class="rounded-lg shadow-lg">
+                        <div class="absolute inset-0 bg-gradient-to-t from-purple-900 via-transparent to-transparent opacity-75 rounded-lg"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- Key3: Collaborative Editing -->
+        <div class="relative overflow-hidden fade-in-section bg-white text-gray-900 py-20 px-4 sm:px-6 lg:px-8">
+            <!-- Key3: Collaborative Editing -->
+            <section aria-labelledby="key3-heading" class="relative mx-auto max-w-7xl flex flex-col lg:flex-row items-center text-center lg:text-left lg:space-x-8">
+                <div class="lg:w-1/2 order-last lg:order-first mt-10 lg:mt-0 lg:pl-10 flex justify-center">
+                    <div class="relative w-full max-w-md">
+                        <img src="homepage_tmp.jpg" alt="Collaborative Editing" class="rounded-lg shadow-lg">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-50 rounded-lg"></div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2">
+                    <h2 id="key3-heading" class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-purple-700">Collaborative Editing</h2>
+                    <p class="mt-4 text-xl text-gray-700">
+                        Work collaboratively like Tencent Docs. Students and teachers can edit recommendation letters simultaneously using Tencent API, with personalized formats for better application scenarios.
+                    </p>
+                </div>
+            </section>
+        </div>
+
+
+
+        <!-- 声明  -->
+        <div class="relative overflow-hidden fade-in-section bg-white text-gray-900 py-20 px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+                <div class="relative overflow-hidden rounded-lg">
+                    <div class="absolute inset-0">
+                        <img src="homepage_tmp.jpg" alt="" class="h-full w-full object-cover object-center">
+                    </div>
+                    <div class="relative bg-purple-900 bg-opacity-75 px-6 py-32 sm:px-12 sm:py-40 lg:px-16">
+                        <div class="relative mx-auto flex max-w-3xl flex-col items-center text-center">
+                            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                                <span class="block sm:inline">Information Aggregation</span>
+                                <span class="block sm:inline">and Synchronization</span>
+                            </h2>
+                            <p class="mt-3 text-xl text-gray-200">Experience a dedicated inbox that consolidates all your emails. Leveraging text-mining technology, our platform extracts key information such as student names, school names, and deadlines, automatically creating calendar notifications for a seamless workflow.</p>
+                            <a href="log_in" class="mt-8 block w-full rounded-md border border-transparent bg-purple-500 px-8 py-3 text-base font-medium text-gray-900 hover:bg-purple-600 sm:w-auto">Discover More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+    </main>
+</div>
+
+
+
+</body>>
+
+<script>
+    window.addEventListener('scroll', function () {
+        var fadeInElements = document.querySelectorAll('.fade-in-section');
+
+        fadeInElements.forEach(function (element) {
+            var position = element.getBoundingClientRect();
+
+            // 检查元素是否在视口中
+            if (position.top < window.innerHeight && position.bottom >= 0) {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            } else {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(-20px)';
+            }
+        });
+    });
+</script>
+</html>

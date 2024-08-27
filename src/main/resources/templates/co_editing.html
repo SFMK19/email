@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Document Editing</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="etherpad.js"></script>
+    <style>
+        .editor-area {
+            min-height: 400px;
+        }
+        .rounded-input {
+            border-radius: 9999px;
+        }
+        .rounded-button {
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<!-- Top Navigation Bar -->
+<nav class="bg-white dark:bg-gray-800 transition-colors duration-300 border-b border-gray-200 dark:border-black">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+            <!-- Logo -->
+            <div class="hidden lg:flex lg:items-center">
+                <a href="#">
+                    <img class="h-10 w-auto" src="./images/logo.png" alt="Logo">
+                </a>
+            </div>
+            <!-- Navigation Links -->
+            <div class="hidden h-full lg:flex">
+                <div class="ml-8">
+                    <div class="flex h-full justify-center space-x-8">
+                        <a href="/home_page_auth" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out">Home</a>
+                        <a href="match_student" class="border-transparent text-grey-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out">Match</a>
+                        <a href="ai_polish" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out">AI Polishing</a>
+                        <a href="co_edit" class="border-transparent text-purple-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out">Co-editing</a>
+                        <a href="inbox" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out">Inbox</a>
+                        <a href="./subPage/Others/Help.html" class="border-transparent text-gray-700 dark:text-white hover:text-purple-600 relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out">Help</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="flex flex-1 items-center lg:hidden">
+                <button type="button" class="-ml-2 rounded-md bg-white p-2 text-gray-400 dark:bg-gray-950">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Account and Search -->
+            <div class="flex flex-1 items-center justify-end">
+                <div class="hidden lg:flex space-x-6">
+                    <button class="p-2 text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </button>
+                    <button class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-gray-200">
+                            <g class="dark:hidden">
+                                <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.485-7.071l1.414 1.414M6.343 17.657l1.414-1.414m12.728 0l-1.414-1.414M6.343 6.343L4.93 7.757"/>
+                            </g>
+                            <g class="hidden dark:block">
+                                <path fill="currentColor" d="M21 12.795A9.004 9.004 0 0012.205 3a7.5 7.5 0 018.8 8.8 9.005 9.005 0 00-.005 1.995z"/>
+                            </g>
+                        </svg>
+                    </button>
+                    <button class="p-2 bg-gray-200 dark:bg-gray-700 rounded-2xl" onclick="window.location.href = 'index_chinese.html';">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex lg:hidden space-x-4 px-4">
+                    <button class="-m-2 p-2 text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <img class="inline-block h-10 w-10 rounded-full" src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?size=626&ext=jpg" alt="User Avatar">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="flex flex-row h-screen">
+    <!-- User List -->
+    <div class="w-1/4 bg-gray-200 p-4 overflow-y-auto">
+        <h2 class="text-xl font-semibold mb-4">Users</h2>
+        <ul>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 bg-white rounded hover:bg-gray-100">
+                    <img src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?size=626&ext=jpg" alt="User" class="h-10 w-10 rounded-full mr-2">
+                    <span>John Doe</span>
+                </a>
+            </li>
+            <li class="mb-2">
+                <a href="#" class="flex items-center p-2 bg-white rounded hover:bg-gray-100">
+                    <img src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?size=626&ext=jpg" alt="User" class="h-10 w-10 rounded-full mr-2">
+                    <span>Jane Smith</span>
+                </a>
+            </li>
+            <!-- Add more users here -->
+        </ul>
+    </div>
+
+    <!-- Document Editor -->
+    <div class="flex-1 flex flex-col bg-white p
+    p-4 overflow-y-auto">
+        <!-- 右侧：推荐信编辑器模块 -->
+        <div class="flex-1 p-4 border-r">
+            <div class="flex items-center justify-between mb-4"> <!-- 新增容器用于布局 -->
+                <h2 class="text-2xl font-semibold">Edit Your Letter with AI!</h2>
+                <button id="saveBtn" class="bg-green-500 text-white py-2 px-4 rounded">Export</button> <!-- 保存按钮 -->
+            </div>
+            <iframe id="etherpad" src="../static/index.html" width="100%" height="95%"></iframe>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="infoModal1" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <!-- Background overlay -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"></span>
+        <!-- Modal Content -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full" style="margin: 20px; max-height: 90vh; overflow-y: auto;">
+            <!-- Modal Header with Navigation -->
+            <div class="bg-gray-100 px-4 py-3 border-b border-gray-300 text-lg leading-6 font-bold">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-gray-900">Please input your basic information so that we can generate the proper template</h3>
+                    <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="closeModal1()">×</button>
+                </div>
+            </div>
+            <!-- Modal Body -->
+            <div class="flex-grow p-6">
+                <!-- Basic Information -->
+                <div id="page4" class="page-content">
+                    <form id = "newLetterForm1">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-1">Recommendee Name</label>
+                                <input type="text" name="recommendeeName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Recommender Name</label>
+                                <input type="text" name="recommenderName" placeholder="Enter Name" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Gender</label>
+                                <select name="gender" class="w-full p-2 border border-gray-300 rounded-md">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-1">Position</label>
+                                <input type="text" name="position" placeholder="Enter Position" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Phone</label>
+                                <input type="text" name="phone" placeholder="Enter Phone Number" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Email</label>
+                                <input type="email" name="email" placeholder="Enter Email Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Organization</label>
+                                <input type="text" name="organization" placeholder="Enter Organization" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Address</label>
+                                <input type="text" name="address" placeholder="Enter Address" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block mb-1">Major</label>
+                                <input type="text" name="major" placeholder="Enter Major" class="w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm" id="submitModal1">Submit</button>
+                <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" id="closeModal1">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Simulate user list and chat functionality (without real-time backend)
+    document.getElementById('sendMessage').addEventListener('click', function() {
+        const chatWindow = document.getElementById('chatWindow');
+        const chatMessage = document.getElementById('chatMessage');
+        const message = chatMessage.value.trim();
+        if (message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'p-2 mb-2 bg-gray-100 rounded';
+            messageElement.textContent = message;
+            chatWindow.appendChild(messageElement);
+            chatMessage.value = '';
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+        }
+    });
+
+    // Placeholder for user list interactions
+    document.querySelectorAll('.user-list-item').forEach(item => {
+        item.addEventListener('click', function() {
+            alert('User clicked: ' + this.textContent);
+        });
+    });
+</script>
+
+<script>
+    function closeModal1() {
+        document.getElementById('infoModal1').classList.add('hidden');
+    }
+</script>
+<script>
+    $(document).ready(function(){
+
+        // 关闭模态框1
+        $('#closeModal1').click(function() {
+            $('#infoModal1').addClass('hidden');
+        });
+        // 绑定提交按钮点击事件1
+        $('#submitModal1').click(function() {
+            $('#newLetterForm1').submit();
+        });
+
+        // 表单提交事件处理1
+        $(document).ready(function(){
+
+            // 表单提交事件处理
+            $('#newLetterForm1').submit(function(event) {
+                event.preventDefault();
+                // 获取第一个表单的数据
+                var formData1 = $(this).serializeArray();
+
+                // 保存表单数据到 sessionStorage
+                sessionStorage.setItem('formData', JSON.stringify(formData1));
+
+                // 关闭模态框
+                $('#infoModal1').addClass('hidden');
+
+                // 继续执行保存逻辑，调用保存按钮的点击事件
+                    $('#saveBtn').click();
+            });
+        });
+
+    });
+</script>
+
+<script>
+    document.getElementById('saveBtn').addEventListener('click', function() {
+        // 从 sessionStorage 获取存储的数据
+        var formData = JSON.parse(sessionStorage.getItem('formData'));
+        var padId = sessionStorage.getItem('padId');
+
+        if (padId) {
+            if (formData) {
+                // 添加 padId 到表单数据中
+                formData.padId = padId;
+
+                // 转换 formData 为 URL 编码的字符串
+                var urlEncodedData = $.param(formData) + "&padId=" + padId;
+
+                // 使用 POST 请求将数据发送到后端保存
+                $.ajax({
+                    url: '/export/pdf',
+                    method: 'POST',
+                    data: urlEncodedData,
+                    processData: false, // 不处理数据
+                    contentType: 'application/x-www-form-urlencoded', // 设置 Content-Type
+                    xhrFields: {
+                        responseType: 'blob' // 指定响应类型为 Blob
+                    },
+                    success: function(response, status, xhr) {
+                        // 从响应头中获取文件名
+                        var disposition = xhr.getResponseHeader('Content-Disposition');
+                        var filename = 'document.pdf'; // 默认文件名
+                        if (disposition && disposition.indexOf('filename=') !== -1) {
+                            filename = disposition.split('filename=')[1].trim().replace(/"/g, '');
+                        }
+
+                        // 创建一个 Blob 对象
+                        var blob = new Blob([response], { type: 'application/pdf' });
+
+                        // 创建一个下载链接
+                        var downloadUrl = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = downloadUrl;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(downloadUrl);
+
+                        // 提示保存成功
+                        alert('PDF 文件已保存并下载！');
+                        console.log('Extracted filename:', filename);
+                        console.log('Response content:', response);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        // 提示保存失败
+                        alert('保存失败，请重试');
+                        console.error("Error: " + textStatus + ", " + errorThrown);
+                    }
+                });
+            } else {
+                // 如果没有 formData，则显示模态框，要求用户填写基本信息
+                $('#infoModal1').removeClass('hidden');
+            }
+        } else {
+            alert('未找到保存的数据');
+        }
+    });
+</script>
+
+</body>
+</html>

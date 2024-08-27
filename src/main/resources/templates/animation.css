@@ -1,0 +1,6 @@
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(100px); /* 增加初始的Y轴偏移量 */
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.55, 0.72),
+    transform 0.3s cubic-bezier(0.47, 0, 0.75, 0.72);
+}
